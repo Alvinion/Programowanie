@@ -6,3 +6,97 @@
 #include <string>
 #include <cstdlib>
 using namespace std;
+
+
+
+char *jednosci[] = {"", " jeden", " dwa", " trzy", " cztery", " piec", " szesc", " siedem", " osiem", " dziewiec"};
+char *nascie[] = {"dziesiec", " jedenascie", " dwanascie", " trzynascie", " czternascie", " pietnascie", " szesnascie", " siedemnascie", " osiemnascie", " dziewietnascie"};
+char *dziesiatki[] ={"", " dziesiec", " dwadziescia", " trzydziesci", " czterdziesci", " piecdziesiat", " szescdziesiat", " siedemdziesiat", " osiemdziesiat", " dziewiecdziesiat"};
+char *setki[] = {"", " sto", " dwiescie", " trzysta", " czterysta", " piecset", " szescset", " siedemset", " osiemset", " dziewiecset"};
+char *x[] = {"", " tys.", " mln."};
+
+
+  
+class Number{
+public:
+	Number(long _licz);
+	~Number();
+	string LiczNaSlow(long licz);
+	string Wyswietl();
+private:
+	long liczba;
+	string slowo;
+};
+
+Number::Number(long _licz){
+	licz = _licz;
+}
+
+string Number::LiczNaSlow(long licz)
+    {        
+        long liczba=licz;
+		
+		string slownie = " ";
+		int koncowka;
+        int rzad = 0;
+        int j = 0;
+        
+
+        
+
+        if (liczba<0)
+                {
+                cout <<" Liczba musi byc z zakresu 0 do 100000000000";
+                
+                }
+
+        if (liczba==0) cout <<"zero";
+
+        while (liczba>0)
+                {
+                koncowka=(liczba%10);
+                liczba/=10;
+                if ((j==0)&&(liczba%100!=0 || liczba<100)) slownie = x[rzad] + slownie;
+                if ((j==0)&&(liczba%10!=1)) slownie = jednosci[koncowka] + slownie;
+                if ((j==0)&&(liczba%10==1))
+                        {
+                        slownie = nascie[koncowka] + slownie;
+                        liczba/=10;
+                        j+=2;
+                        continue;
+                        }
+                if (j==1) slownie = dziesiatki[koncowka] + slownie;
+                if (j==2)
+                        {
+                        slownie = setki[koncowka] + slownie;
+                        j=-1;
+                        rzad++;
+                        }
+                j++;
+                }
+
+         slownie=slowo;
+        
+       }
+
+string Number::Wyswietl(){
+	return slowo;
+}
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	long licz1;
+   cout << ("Wprowadz liczbe w postaci cyfr: ");
+   cin >> licz;
+   Number new(licz1);
+
+
+   cout << endl << ("Liczba w postaci slownej to: ") << new.Wyswietl() << endl << endl;
+        
+   system("pause");
+	
+	return 0;
+}
+
+
