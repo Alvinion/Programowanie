@@ -1,102 +1,140 @@
-// lab2.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
 #include <iostream>
 #include <string>
-#include <cstdlib>
+
 using namespace std;
 
-
-
-char *jednosci[] = {"", " jeden", " dwa", " trzy", " cztery", " piec", " szesc", " siedem", " osiem", " dziewiec"};
-char *nascie[] = {"dziesiec", " jedenascie", " dwanascie", " trzynascie", " czternascie", " pietnascie", " szesnascie", " siedemnascie", " osiemnascie", " dziewietnascie"};
-char *dziesiatki[] ={"", " dziesiec", " dwadziescia", " trzydziesci", " czterdziesci", " piecdziesiat", " szescdziesiat", " siedemdziesiat", " osiemdziesiat", " dziewiecdziesiat"};
-char *setki[] = {"", " sto", " dwiescie", " trzysta", " czterysta", " piecset", " szescset", " siedemset", " osiemset", " dziewiecset"};
-char *x[] = {"", " tys.", " mln."};
-
-
-  
-class Number{
-public:
-	Number(long _licz);
-	~Number();
-	string LiczNaSlow(long licz);
-	string Wyswietl();
-private:
-	long liczba;
-	string slowo;
+class ToText
+{
+        public:
+                ToText(int);
+                ~ToText();
+                void Text(int, int);
+                void ToString();
+        private:
+        int liczba;
+        string napis;
 };
 
-Number::Number(long _licz){
-	licz = _licz;
-}
+string napis;
 
-string Number::LiczNaSlow(long licz)
-    {        
-        long liczba=licz;
-		
-		string slownie = " ";
-		int koncowka;
-        int rzad = 0;
-        int j = 0;
-        
+void main()
 
-        
-
-        if (liczba<0)
-                {
-                cout <<" Liczba musi byc z zakresu 0 do 100000000000";
-                
-                }
-
-        if (liczba==0) cout <<"zero";
-
-        while (liczba>0)
-                {
-                koncowka=(liczba%10);
-                liczba/=10;
-                if ((j==0)&&(liczba%100!=0 || liczba<100)) slownie = x[rzad] + slownie;
-                if ((j==0)&&(liczba%10!=1)) slownie = jednosci[koncowka] + slownie;
-                if ((j==0)&&(liczba%10==1))
-                        {
-                        slownie = nascie[koncowka] + slownie;
-                        liczba/=10;
-                        j+=2;
-                        continue;
-                        }
-                if (j==1) slownie = dziesiatki[koncowka] + slownie;
-                if (j==2)
-                        {
-                        slownie = setki[koncowka] + slownie;
-                        j=-1;
-                        rzad++;
-                        }
-                j++;
-                }
-
-         slownie=slowo;
-        
-       }
-
-string Number::Wyswietl(){
-	return slowo;
-}
-
-
-int _tmain(int argc, _TCHAR* argv[])
 {
-	long licz1;
-   cout << ("Wprowadz liczbe w postaci cyfr: ");
-   cin >> licz;
-   Number new(licz1);
+      int a;
+      cout << "Podaj liczbe od 0 do 1 000 000 000 : ";
+      cin >> a;
+         cout << "Twoja liczba slownie :" << endl;
+         ToText L1(a);
+      system("pause");
+      
+      }
 
+ToText :: ToText (int _liczba)
+{
+        liczba=_liczba;
+        ToString();
 
-   cout << endl << ("Liczba w postaci slownej to: ") << new.Wyswietl() << endl << endl;
+};
+ToText :: ~ToText(){};
+
+void ToText :: ToString()
+{
+         int zmienna=0;
+                 int rzedna=0;
+         
+                 if (liczba==1000000000) napis+="Jeden Miliard";
+                 else if (liczba==1000000) napis+="Jeden Milion";
+                 else if (liczba==0) napis+="Zero";
+                 else if (liczba>=1 & liczba<=999999999)
+                 {
+                        zmienna=liczba/1000000;
+                        liczba=liczba-(zmienna*1000000);
+                                if (zmienna!=0) Text(zmienna,rzedna); rzedna++;
+                        zmienna=liczba/1000;
+                        liczba=liczba-(zmienna*1000);
+                                if (zmienna!=0) Text(zmienna,rzedna); rzedna++;
+                        zmienna=liczba;
+                                Text(zmienna,rzedna);
+         }
+         else napis+="Nie poprawna liczba";
+      
+         cout << napis;
+      cout << endl;
+};
+void ToText :: Text(int zmienna, int rzedna)
+{
+         int setka,dziesiatka,jednostka;
+        setka=zmienna/100;
+        zmienna=zmienna-(setka*100);
+        dziesiatka=zmienna/10;
+        zmienna=zmienna-(dziesiatka*10);
+        jednostka=zmienna;
+        if (dziesiatka==1) jednostka=jednostka+10;
         
-   system("pause");
-	
-	return 0;
-}
+                 switch(setka)
+      {
+                 case 0: napis+=""; break;
+                 case 1: napis+="Sto "; break;
+                 case 2: napis+="Dwiescie "; break;
+                 case 3: napis+="Trzysta "; break;
+                 case 4: napis+="Czterysta "; break;
+                 case 5: napis+="Piecset "; break;
+                 case 6: napis+="Szescset "; break;
+                 case 7: napis+="Siedemset "; break;
+                 case 8: napis+="Osiemset "; break;
+                 case 9: napis+="Dziewiecset "; break;
+                 }
 
+                 switch(dziesiatka)
+      {
+                 case 0: napis+=""; break;
+                 case 1: napis+=""; break;
+                 case 2: napis+="Dwadziescia "; break;
+                 case 3: napis+="Trzydziesci "; break;
+                 case 4: napis+="Czterdziesci "; break;
+                 case 5: napis+="Piecdziesiat "; break;
+                 case 6: napis+="Szescdziesiat "; break;
+                 case 7: napis+="Siedemdziesiat "; break;
+                 case 8: napis+="Osiemdziesiat "; break;
+                 case 9: napis+="Dziewiecdziesiat "; break;
+                 }
+                    switch(jednostka)
+      {
+                 case 0: napis+=""; break;
+                 case 1: napis+="Jeden "; break;
+                 case 2: napis+="Dwa "; break;
+                 case 3: napis+="Trzy "; break;
+                 case 4: napis+="Cztery "; break;
+                 case 5: napis+="Piec "; break;
+                 case 6: napis+="Szesc "; break;
+                 case 7: napis+="Siedem "; break;
+                 case 8: napis+="Osiem "; break;
+                 case 9: napis+="Dziewiec " ; break;
+                 case 10: napis+="Dziesiec "; break;
+                 case 11: napis+="Jedenascie "; break;
+                 case 12: napis+="Dwanascie "; break;
+                 case 13: napis+="Trzynascie "; break;
+                 case 14: napis+="Czternascie "; break;
+                 case 15: napis+="Pietnascie "; break;
+                 case 16: napis+="Szesnascie "; break;
+                 case 17: napis+="Siedemnascie "; break;
+                 case 18: napis+="Osiemnascie "; break;
+                 case 19: napis+="Dziewietnascie "; break;
+                 }
+                 switch(rzedna)
+                                 {
+                                 case 0:
+                    if (jednostka==1) napis+="Milion ";
+                                        else if (jednostka>=2 & jednostka<=4) napis+="Miliony ";
+                                        else if (jednostka>=5 & jednostka<=21) napis+="Milionów ";
+                                else if (jednostka==0) napis+="Milionow "; break;
+                                 case 1:
+                                        if (jednostka==1) napis+="Tysiac ";
+                                        else if (jednostka>=2 & jednostka<=4) napis+="Tysiace ";
+                                        else if (jednostka>=5 & jednostka<=21) napis+="Tysiecy ";
+                                else if (jednostka==0) napis+="Tysiecy "; break;
+                                 case 2: break;
+                                 }
 
+};
