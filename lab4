@@ -1,0 +1,71 @@
+// lab5.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+using namespace std;
+
+class place{
+
+private:
+	string info;
+	bool visit;
+	place* n;
+	place* s;
+	place* e;
+	place* w;
+
+public:
+	place();
+	~place(){};
+	string getinfo();
+	bool getvisit(bool);
+	place* getn(place*);
+	place* gets(place*);
+	place* gete(place*);
+	place* getw(place*);
+
+
+};
+
+place::place(){
+
+};
+int _tmain(int argc, _TCHAR* argv[])
+{
+	const int a=3;
+
+	int tab1[a][a];
+	int l;
+
+	place*** tab = new place**[a];
+
+	for (int i=0;i<3;i++){
+		
+			
+			tab[i]=new place*[3];
+
+	
+}
+	
+	for(int z=0; z<3;z++){
+		for(int x=0;x<3;x++){
+			
+			cout << "Podaj wartosc "<< "[" <<z <<"]" <<"[" <<x <<"]= ";
+			cin >> l;
+			tab1[z][x]=l;
+						
+			
+		}
+		
+	}
+
+
+
+	
+
+	system("pause");
+	return 0;
+}
+
