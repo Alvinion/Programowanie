@@ -127,7 +127,7 @@ void ToText :: Text(int zmienna, int rzedna)
                                  case 0:
                     if (jednostka==1) napis+="Milion ";
                                         else if (jednostka>=2 & jednostka<=4) napis+="Miliony ";
-                                        else if (jednostka>=5 & jednostka<=21) napis+="Milionów ";
+                                        else if (jednostka>=5 & jednostka<=21) napis+="Milionow ";
                                 else if (jednostka==0) napis+="Milionow "; break;
                                  case 1:
                                         if (jednostka==1) napis+="Tysiac ";
