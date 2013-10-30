@@ -1,0 +1,219 @@
+// lab3.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <time.h>
+#include <cstdlib>
+#include <ctime>
+
+
+using namespace std;
+
+class student{
+
+private:
+	string id;
+	int grp;
+	int* grade;
+	
+
+public:
+	student(){;};
+	student(string, int , int*);
+	student(student &);
+	~student();	
+	string getid();
+	string getgrade();
+	string getgrp();
+	void disp();
+	void setstudent(string, int, int*);
+
+};
+
+
+student::student(string _id, int _grp, int* _grade){
+	
+	setstudent(_id, _grp, _grade);
+
+}
+
+student::~student(){;}
+
+student::student(student &source){
+
+	grp=source.grp;
+
+	grade=new int[10];
+	for (short i=0;i<10;i++)
+	{
+		grade[i]=source.grade[i];
+	}
+	
+	id= source.id;
+
+}
+
+
+void student::setstudent(string _id, int _grp, int* _grade){
+
+	id=_id;
+	
+	grp=_grp;
+
+	grade= new int[10];
+	for (short i=0;i<10;i++)
+	{
+		grade[i]=_grade[i];
+	}
+
+}
+
+
+string student::getid(){
+
+	return id;
+}
+
+string student::getgrp(){
+	
+	stringstream g;
+	g << grp;
+	return g.str();
+
+}
+
+string student::getgrade(){
+
+	stringstream oc;
+	int* tab = new int[10];
+	
+	for (int i=0; i<10;i++)
+	{
+
+		tab[i] = grade[i];
+		oc << tab[i] << " ";
+
+	}
+	return oc.str();
+}
+
+void student::disp(){
+
+	cout << getid() << endl;
+	cout << getgrp() << endl;
+	cout << getgrade() << endl;
+
+}
+
+
+
+class group{
+
+private:
+
+	student* list;
+	int ile;
+	group(){};
+
+public:
+		
+	group(int);
+	~group();
+	group(group &);
+	void getlist();
+	void add(int, string, int, int*);
+
+};
+
+group::group(int _ile){
+
+	ile=_ile;
+	list= new student[ile];
+
+}
+
+
+group::group(group &source){
+
+	ile=source.ile;
+
+	list= new student[source.ile];
+
+	for (short i=0;i<source.ile;i++)
+	{
+		student a(source.list[i]);
+		list[i]=a;
+	}
+}
+
+group::~group(){;}
+
+void group::add(int _poz, string _id, int _grp, int* _grade){
+
+	list[_poz]=student(_id,_grp,_grade);
+
+};
+
+void group::getlist(){
+
+	for (short i=0; i<ile;i++)
+	{
+		cout << list[i].getid() <<" " << i << " || ";		 
+		cout << list[i].getgrp() << " || ";
+		cout << list[i].getgrade() << endl;
+	}
+
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	
+	srand(time(NULL));
+
+	group g1 = group(5);
+	group g2 = group(5);
+
+	int s1_grade[10];
+	int s2_grade[10];
+
+	for (int i=0;i<10;i++)
+	{				
+		s1_grade[i]=rand()%4+2;		
+	}
+	
+	
+	for (int i=0;i<5;i++){
+		g1.add(i,"A",210,s1_grade);
+	}
+	
+	
+	cout<<"Grupa 1:"<<endl;
+	g1.getlist();	
+  cout<< endl;
+	
+	for (int i=0;i<10;i++)
+	{				
+		s2_grade[i]=rand()%4+2;		
+	}
+	
+	
+	for (int i=0;i<5;i++){
+		g2.add(i,"B",222,s2_grade);
+	}
+	
+	
+	cout<<"Grupa 2:"<<endl;
+	g2.getlist();	
+  cout<< endl;
+
+	cout << "Grupa 3:" << endl;
+	group g3 = group(g2);
+	g3.getlist();
+
+	system("pause");
+}
+
+	
