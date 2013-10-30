@@ -18,17 +18,6 @@ class ToText
 
 string napis;
 
-void main()
-
-{
-      int a;
-      cout << "Podaj liczbe od 0 do 1 000 000 000 : ";
-      cin >> a;
-         cout << "Twoja liczba slownie :" << endl;
-         ToText L1(a);
-      system("pause");
-      
-      }
 
 ToText :: ToText (int _liczba)
 {
@@ -138,3 +127,16 @@ void ToText :: Text(int zmienna, int rzedna)
                                  }
 
 };
+
+void main()
+
+{
+      int a;
+      cout << "Podaj liczbe od 0 do 1 000 000 000 : ";
+      cin >> a;
+         cout << "Twoja liczba slownie :" << endl;
+         ToText L1(a);
+      system("pause");
+      
+      }
+
