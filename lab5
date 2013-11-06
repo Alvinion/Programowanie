@@ -1,0 +1,291 @@
+#include "matrix.h"
+#include <iomanip>
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Tworzy nową macierz o podanej liczbie wierszy i kolumn.
+/// Jednocześnie niszczy dotychczasową. Jeśli 'cols' <= 0 przykmuje się,
+/// że liczba kolum równa jest liczbie wierszy. Jest to ustawienie domyślne.
+/// Jeśli 'rows' <= 0 nie jest tworzona nowa macierz a jedynie niszczona obecna.
+////////////////////////////////////////////////////////////////////////////////
+void Matrix::create( int rows, int cols )
+{
+	destroy();
+
+	// sprawdzenie poprawności żadanej liczby wierszy
+	if( rows <= 0 ) return;
+
+	// alokacja tablicy wskażników na poszczególne wiersze macierzy
+	m_pBuf = new double*[rows];
+	if( !m_pBuf ) throw std::bad_alloc( "Nie mogę utworzyć macierzy!" );
+
+	m_rows = rows;
+	m_cols = cols>0? cols : rows;
+
+	// alokacja pamięci dla wszystkich wierszy
+	for( int i=0; i<m_rows; i++ ) {
+		m_pBuf[i] = new double[m_cols];
+		if( !m_pBuf[i] ) {
+			destroy();
+			throw std::bad_alloc( "Nie mogę utworzyć macierzy!" );
+		}
+	}
+
+	// zerowanie macierzy
+	for( int i=0; i<m_rows; i++ ) {
+		for( int j=0; j<m_cols; j++ ) m_pBuf[i][j] = 0;
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Niszczy bierzącą macierz.
+////////////////////////////////////////////////////////////////////////////////
+void Matrix::destroy()
+{
+	if( m_pBuf == NULL ) return; // macierz nie jest utworzona
+
+
+	for( int i=0; i<m_rows; i++ ) delete[] m_pBuf[i];
+	delete[] m_pBuf;
+
+	m_pBuf = NULL;
+	m_rows = 0;
+	m_cols = 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca wartość (i,j)-tego elementu macierzy.
+/// Nie jest możliwa jego modyfikacja (metoda typu const).
+////////////////////////////////////////////////////////////////////////////////
+double Matrix::at( int i, int j ) const
+{
+	// dla macierzy nie utworzonej m_rows==0 i poniższy warunek jest zawsze spełniony
+	if( i<0 || i >= m_rows ) throw std::out_of_range( "indeks spoza zakresu lub macierz nie utworzona!" );
+	if( j<0 || j >= m_cols ) throw std::out_of_range( "indeks spoza zakresu!" );
+
+	return m_pBuf[i][j];
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca i-ty wirsz macierzy. Możliwa jest modyfikacja jego elementów.
+////////////////////////////////////////////////////////////////////////////////
+double* Matrix::operator [] ( int i )
+{
+	// dla macierzy nie utworzonej m_rows==0 i poniższy warunek jest zawsze spełniony
+	if( i<0 || i >= m_rows ) throw std::out_of_range( "indeks spoza zakresu lub macierz nie utworzona!" );
+
+	return m_pBuf[i];
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Kopiuje daną macież do bierzącej nawet jeśli dana jest nie utworzona.
+////////////////////////////////////////////////////////////////////////////////
+Matrix& Matrix::operator = ( const Matrix& m )
+{
+	if( this != &m ) {
+		create( m.m_rows, m.m_cols );
+
+		// Jeśli m.m_rows == 0 (macierz nie utworzona)
+		// poniższa pętla się nie wykona.
+		// Podobnie jest też w innych metodach tej klasy.
+		for( int i=0; i<m_rows; i++ ) {
+			for( int j=0; j<m_cols; j++ ) m_pBuf[i][j] = m.m_pBuf[i][j];
+		}
+	}
+
+	return *this;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca macierz przeciwną do danej.
+/// Jeśli macierz jest nie utworzona funkcja zwraca macierz nie utworzoną.
+////////////////////////////////////////////////////////////////////////////////
+Matrix operator - ( const Matrix& m )
+{
+	Matrix n( m.rows(), m.cols() );
+
+	for( int i=0; i<n.m_rows; i++ ) {
+		for( int j=0; j<n.m_cols; j++ ) n.m_pBuf[i][j] = -m.m_pBuf[i][j];
+	}
+
+	return n;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Dodaje dwie macierze o tych samych rozmiarach.
+/// Jeśli obie macierze są nie utworzone funkcja zwraca macierz nie utworzoną.
+////////////////////////////////////////////////////////////////////////////////
+Matrix operator + ( const Matrix& a, const Matrix& b )
+{
+	if( a.rows() != b.rows() ) throw std::invalid_argument( "Nieprawidłowe rozmiary wierszy macierzy! (operator +)" );
+	if( a.cols() != b.cols() ) throw std::invalid_argument( "Nieprawidłowe rozmiary kolumn macierzy! (operator +)" );
+
+	Matrix m( a.rows(), a.cols() );
+
+	for( int i=0; i<m.m_rows; i++ ) {
+		for( int j=0; j<m.m_cols; j++ ) m.m_pBuf[i][j] = a.m_pBuf[i][j] + b.m_pBuf[i][j];
+	}
+
+	return m;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Odejmuje dwie macierze o tych samych rozmiarach.
+/// Jeśli obie macierze są nie utworzone funkcja zwraca macierz nie utworzoną.
+////////////////////////////////////////////////////////////////////////////////
+Matrix operator - ( const Matrix& a, const Matrix& b )
+{
+	if( a.rows() != b.rows() ) throw std::invalid_argument( "Nieprawidłowe rozmiary wierszy macierzy! (operator -)" );
+	if( a.cols() != b.cols() ) throw std::invalid_argument( "Nieprawidłowe rozmiary kolumn macierzy! (operator -)" );
+
+	Matrix m( a.rows(), a.cols() );
+
+	for( int i=0; i<m.m_rows; i++ ) {
+		for( int j=0; j<m.m_cols; j++ ) m.m_pBuf[i][j] = a.m_pBuf[i][j] - b.m_pBuf[i][j];
+	}
+
+	return m;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca iloczyn dwóch macierzy o kompatybilnych rozmiarach.
+/// Jeśli obie macierze są nie utworzone funkcja zwraca macierz nie utworzoną.
+////////////////////////////////////////////////////////////////////////////////
+Matrix operator * ( const Matrix& a, const Matrix& b )
+{
+	if( a.cols() != b.rows() ) throw std::invalid_argument( "Niekompatybilne rozmiary macierzy! (operator *)" );
+
+	Matrix m( a.rows(), b.cols() );
+
+	for( int i=0; i<m.m_rows; i++ )
+	for( int j=0; j<m.m_cols; j++ ) {
+		for( int k=0; k<a.cols(); k++ )
+			m.m_pBuf[i][j] += a.m_pBuf[i][k] * b.m_pBuf[k][j];
+	}
+
+	return m;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca macierz pomnożoną z lewej strony przez skalar
+/// Jeśli macierz jest nie utworzona funkcja zwraca macierz nie utworzoną.
+////////////////////////////////////////////////////////////////////////////////
+Matrix operator * ( double f, const Matrix& m )
+{
+	Matrix n( m.rows(), m.cols() );
+
+	for( int i=0; i<n.m_rows; i++ ) {
+		for( int j=0; j<n.m_cols; j++ ) n.m_pBuf[i][j] = f * m.m_pBuf[i][j];
+	}
+
+	return n;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca macierz podzieloną przez skalar
+/// Jeśli macierz jest nie utworzona funkcja zwraca macierz nie utworzoną.
+////////////////////////////////////////////////////////////////////////////////
+Matrix operator / ( const Matrix& m, double f )
+{
+	if( fabs(f) < EPS ) throw std::invalid_argument( "Dzielenie przez zero!" );
+	return m * (1.0/f);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca iloczyn macierzy przez wektor o kompatybilnym rozmiarze.
+/// Jeśli macierz i wektor są nie utworzone funkcja zwraca wektor nie utworzony.
+////////////////////////////////////////////////////////////////////////////////
+Vector operator * ( const Matrix& m, const Vector& v )
+{
+	if( m.cols() != v.size() ) throw std::invalid_argument( "Niekompatybilne rozmiary macierzy i wektora! (operator *)" );
+
+	Vector u( m.rows() );
+
+	for( int i=0; i<u.size(); i++ ) {
+		for( int j=0; j<v.size(); j++ )
+			u[i] += m.m_pBuf[i][j] * v.at(j);
+	}
+
+	return u;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Zwraca iloczyn wektora transp. przez macierz o kompatybilnym rozmiarze.
+/// Jeśli macierz i wektor są nie utworzone funkcja zwraca wektor nie utworzony.
+////////////////////////////////////////////////////////////////////////////////
+Vector operator * ( const Vector& v, const Matrix& m )
+{
+	if( m.rows() != v.size() ) throw std::invalid_argument( "Niekompatybilne rozmiary wektora i macierzy! (operator *)" );
+
+	Vector u( m.cols() );
+
+	for( int i=0; i<u.size(); i++ ) {
+		for( int j=0; j<v.size(); j++ )
+			u[i] += v.at(j) * m.m_pBuf[j][i];
+	}
+
+	return u;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Porównuje dwie macierze ze zdefiniowaną dokładnością EPS.
+/// Jeśli obie macierze są nie utworzone funkcja zwraca true.
+////////////////////////////////////////////////////////////////////////////////
+bool operator == ( const Matrix& a, const Matrix& b )
+{
+	if( a.rows() != b.rows() ) return false;
+	if( a.cols() != b.cols() ) return false;
+
+	for( int i=0; i<a.m_rows; i++ )
+	for( int j=0; j<a.m_cols; j++ ) {
+		if( fabs( a.m_pBuf[i][j] - b.m_pBuf[i][j] ) > EPS ) return false;
+	}
+
+	return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Wypisuje macierz na dany strumień.
+////////////////////////////////////////////////////////////////////////////////
+std::ostream& operator << ( std::ostream& os, const Matrix& m )
+{
+	os << std::endl;
+
+	for( int i=0; i<m.rows(); i++ ) {
+		os << '|';
+		for( int j=0; j<m.cols(); j++ ) os << std::setw(5) << m.m_pBuf[i][j];
+		os << " |" << std::endl;
+	}
+
+	return os;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Wczytuje macierz z danego strumienia.
+////////////////////////////////////////////////////////////////////////////////
+std::istream& operator >> ( std::istream& is, Matrix& m )
+{
+	int rows,cols;
+	is >> rows >> cols;
+	m.create( rows, cols );
+
+	for( int i=0; i<m.rows(); i++ ) 
+	for( int j=0; j<m.cols(); j++ ) is >> m.m_pBuf[i][j];
+
+	return is;
+}
