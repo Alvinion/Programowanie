@@ -1,0 +1,91 @@
+// lab5.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class TMatrix
+{
+      private:
+             int Columns; // ilość kolumn macierzy
+             int Rows;    // ilość wierszy macierzy
+      
+      public:
+             double **ValueAt; // wskaźnik na elementy dynamicznie tworzonej macierzy
+             
+             TMatrix(const char*); // deklaracja konstruktora
+             ~TMatrix();           // deklaracja destruktora
+             friend ostream& operator<<(ostream &os, TMatrix); // deklaracja przeciążonego operatora <<
+};
+
+TMatrix::TMatrix(const char format[]="0,0,0;0,0,0;0,0,0;") // definicja kontruktora z domyślną wartością (macierz 3x3 wypełniona zerami)
+{
+             int cCount=0; // ilość przecinków w ciągu format
+             int sCount=0; // ilość średników w ciągu
+             int position=0; // obecna pozycja w buforze
+             int x=0; // kolumna macierzy
+             int y=0; // wiersz macierzy
+             int i; // kontrolka iteracji pętli
+             char buffer[10]; // bufor zapisu liczb do macierzy (max. 10 cyfr)
+             
+             for (int i=0; i<strlen(format); i++) // pętla zliczająca przecinki oraz średniki
+             {
+                 if (format[i] == ',' && sCount == 0)
+                    cCount++;
+                 if (format[i] == ';')
+                    sCount++;
+             }
+                                        
+             ValueAt = new double*[sCount + 1];       // dynamiczne tworzenie macierzy o rozmiarze zbadanym w danym ciągu
+             
+             for (i=0; i<sCount+1; i++)
+                 ValueAt[i] = new double[cCount + 1]; // ...
+                 
+             for (i=0; i<strlen(format); i++) // wypełnianie macierzy liczbami z ciągu
+             {
+                 if (format[i] == ',')
+                 {
+                    ValueAt[y][x] = atoi(buffer);
+                    position = 0;
+                    x++;
+                 }
+                 else if (format[i] == ';')
+                 {
+                    ValueAt[y][x] = atoi(buffer);
+                    position = 0;
+                    y++;
+                    x = 0;
+                 }
+             }
+             Columns = cCount+1; // ilość kolumn (ilosc przecinkow jest o 1 mniejsza od ilosci kolumn)
+             Rows = sCount;      // ilość wierszy
+}             
+
+TMatrix::~TMatrix() // definicja destruktora
+{
+             delete ValueAt; // usuwanie dynamicznie stworzonej macierzy
+}
+
+ostream & operator<<(ostream &os, const TMatrix Matrix) // definicja przeciążonego operatora
+{
+             int x,y;
+             
+             for (y=0; y<Matrix.Rows; y++) // pętla wyświetlająca macierz
+             {
+                 for (x=0; x<Matrix.Columns; x++)
+                 {
+                     cout << Matrix.ValueAt[y][x];
+                 }  
+                 cout << endl;
+             } 
+			 return os;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	return 0;
+}
+
