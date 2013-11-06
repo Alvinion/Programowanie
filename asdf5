@@ -1,0 +1,92 @@
+// lab5.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class TMatrix
+{
+      private:
+             int Columns; 
+             int Rows;    
+      
+      public:
+             double **ValueAt; 
+             
+             TMatrix(const char*); 
+             ~TMatrix();           
+             friend ostream& operator<<(ostream &os, TMatrix); 
+
+};
+
+TMatrix::TMatrix(const char format[]="0,0,0;0,0,0;0,0,0;") 
+{
+             int cCount=0; 
+             int sCount=0; 
+             int position=0;
+             int x=0; 
+             int y=0; 
+             int i; 
+             char buffer[10]; 
+             
+             for (int i=0; i<strlen(format); i++) 
+             {
+                 if (format[i] == ',' && sCount == 0)
+                    cCount++;
+                 if (format[i] == ';')
+                    sCount++;
+             }
+                                        
+             ValueAt = new double*[sCount + 1];      
+             
+             for (i=0; i<sCount+1; i++)
+                 ValueAt[i] = new double[cCount + 1]; 
+
+             for (i=0; i<strlen(format); i++) 
+             {
+                 if (format[i] == ',')
+                 {
+                    ValueAt[y][x] = atoi(buffer);
+                    position = 0;
+                    x++;
+                 }
+                 else if (format[i] == ';')
+                 {
+                    ValueAt[y][x] = atoi(buffer);
+                    position = 0;
+                    y++;
+                    x = 0;
+                 }
+             }
+             Columns = cCount+1;
+             Rows = sCount;     
+}             
+
+TMatrix::~TMatrix() 
+{
+             delete ValueAt;
+}
+
+ostream & operator<<(ostream &os, const TMatrix Matrix) 
+{
+             int x,y;
+             
+             for (y=0; y<Matrix.Rows; y++) 
+             {
+                 for (x=0; x<Matrix.Columns; x++)
+                 {
+                     cout << Matrix.ValueAt[y][x];
+                 }  
+                 cout << endl;
+             } 
+                         return os;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	
+	system("pause");
+}
